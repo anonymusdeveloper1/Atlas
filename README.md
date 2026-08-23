@@ -180,6 +180,44 @@ nothing else. There are no fake countdowns.
 
 ---
 
+## Deploying it
+
+`render.yaml` in the repo root is a [Render Blueprint](https://render.com/docs/blueprint-spec),
+so the free tier can host this with no manual configuration:
+
+1. Sign in at [render.com](https://render.com) with the GitHub account that owns this repo.
+2. **New → Blueprint**, pick the `Atlas` repository, apply.
+3. Wait for the first build (a few minutes), then open the `onrender.com` URL.
+
+If you would rather configure it by hand, the settings are:
+
+| Setting | Value |
+|---|---|
+| Runtime | Node |
+| Build command | `npm install && npm run build` |
+| Start command | `npm run start:demo` |
+| `NODE_VERSION` | `22` |
+
+The free plan gives an **ephemeral disk** that is wiped on every restart, which would
+normally destroy a SQLite database. `npm run start:demo` turns that into a feature by
+reseeding at boot: the demo is always populated and testers cannot permanently break it.
+
+Free instances also **sleep after about 15 minutes of inactivity**, so the first request
+after a quiet period takes 30–60 seconds while the service wakes up.
+
+### Sharing it temporarily instead
+
+To let people test the site running on your own machine, without deploying:
+
+```bash
+npx cloudflared tunnel --url http://localhost:3000
+```
+
+That prints a public HTTPS URL which stays live only while your machine, the server and
+the tunnel are all running. Serve the **production** build for this (`npm run build` then
+`npm start`) — the dev server refuses to send its client bundles to an unfamiliar origin,
+so a tunnelled dev server renders pages that are completely unclickable.
+
 ## Images
 
 Photography is served from `picsum.photos` using stable per-record seeds, so every image
