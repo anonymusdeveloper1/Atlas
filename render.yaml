@@ -1,0 +1,16 @@
+# Render Blueprint — https://render.com/docs/blueprint-spec
+# Free-tier deployment for the Atlas university project.
+#
+# The free plan gives an ephemeral disk that is wiped on every restart, so the
+# SQLite database is recreated and reseeded at boot by `npm run start:demo`.
+# That makes the demo self-healing: testers cannot permanently break the data.
+services:
+  - type: web
+    name: atlas
+    runtime: node
+    plan: free
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:demo
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
